@@ -32,6 +32,7 @@ def parse_args():
     parser.add_argument('--log_dir', type=str, default='JS3C-Net-kitti', help='Experiment root')
     parser.add_argument('--num_votes', type=int, default=10, help='Aggregate segmentation scores with voting [default: 10]')
     parser.add_argument('--dataset', type=str, default='val', help='[val/test]')
+    parser.add_argument('--labels', type=str, default='/dataset/semantic_kitti/dataset/', help='/dataset/semantic_kitti/dataset/')
     return parser.parse_args()
 
 args = parse_args()
@@ -55,6 +56,7 @@ sys.path.append(model_path)
 with open(model_path+'/args.txt', 'r') as f:
     config = json.load(f)
 print(config)
+config['GENERAL']['dataset_dir'] = args.labels
 
 seg_head = importlib.import_module('models.' + config['Segmentation']['model_name'])
 seg_model = seg_head.get_model
@@ -99,6 +101,9 @@ for sequence in sequences:
     points_path = os.path.join(config['GENERAL']['dataset_dir'], 'sequences', sequence, 'velodyne')
     seq_points_name = [os.path.join(points_path, pn) for pn in os.listdir(points_path) if pn.endswith('.bin')]
     seq_points_name.sort()
+    print(points_path)
+    print(config['GENERAL']['dataset_dir'])
+    print(seq_points_name)
     points.extend(seq_points_name)
 
 valid_labels = np.zeros((19), dtype=np.int32)

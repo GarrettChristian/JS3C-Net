@@ -1,7 +1,7 @@
-python setup.py develop
+python3 setup.py develop
 cd nearest_neighbors
-python setup.py install
+python3 setup.py install
 cd ..
 cd pointgroup_ops
-python setup.py develop
+python3 setup.py develop
 cd ..
