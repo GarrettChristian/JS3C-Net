@@ -9,11 +9,10 @@ RUN apt install -y git wget unzip
 RUN wget https://apt.kitware.com/kitware-archive.sh
 RUN chmod +x kitware-archive.sh && ./kitware-archive.sh
 
+RUN pip3 install tqdm==4.64.0
 RUN pip3 install torch==1.6.0
 RUN pip3 install cython==0.29.24
 RUN pip3 install pyyaml==5.1.1
-RUN pip3 install tqdm==4.64.0
-
 
 
 RUN git clone https://github.com/GarrettChristian/JS3C-Net.git
@@ -45,7 +44,7 @@ WORKDIR /spconv/dist
 RUN pip3 install *.whl
 WORKDIR /
 
-
-
+RUN apt install -y libjpeg-dev zlib1g-dev
+RUN pip3 install --upgrade Pillow
 
 

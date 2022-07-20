@@ -29,6 +29,7 @@ def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('Model')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
+    # parser.add_argument('--model', type=str, default='JS3C-Net-kitti', help='Experiment root')
     parser.add_argument('--log_dir', type=str, default='JS3C-Net-kitti', help='Experiment root')
     parser.add_argument('--num_votes', type=int, default=10, help='Aggregate segmentation scores with voting [default: 10]')
     parser.add_argument('--dataset', type=str, default='val', help='[val/test]')
@@ -39,15 +40,21 @@ args = parse_args()
 
 print('Load Model...')
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-model_path = 'log/'+args.log_dir
+# model_path = 'log/'+args.log_dir
+model_path = 'log/JS3C-Net-kitti'
 val_reps = args.num_votes
 
-output_dir = model_path + '/dump/'
-if not os.path.exists(output_dir): os.mkdir(output_dir)
-output_dir = output_dir + 'segmentation'
-if not os.path.exists(output_dir): os.mkdir(output_dir)
-submit_dir = output_dir + '/submit_' + args.dataset + datetime.now().strftime('%Y_%m_%d')
-if not os.path.exists(submit_dir): os.mkdir(submit_dir)
+# output_dir = model_path + '/dump/'
+# if not os.path.exists(output_dir): os.mkdir(output_dir)
+# output_dir = output_dir + 'segmentation'
+# if not os.path.exists(output_dir): os.mkdir(output_dir)
+# submit_dir = output_dir + '/submit_' + args.dataset + datetime.now().strftime('%Y_%m_%d')
+# if not os.path.exists(submit_dir): os.mkdir(submit_dir)
+
+output_dir = args.log_dir
+if not os.path.exists(output_dir): 
+    os.mkdir(output_dir)
+submit_dir = args.log_dir
 
 use_cuda = torch.cuda.is_available()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -181,6 +188,7 @@ with torch.no_grad():
     remap_lut[remap_lut == -1] = -100
 
     for idx, filename in tqdm(enumerate(points), total=len(points)):
+        print(idx)
         components = filename.split('/')
         sequence = components[-3]
         points_name = components[-1]
@@ -195,6 +203,7 @@ with torch.no_grad():
         batch = process_data(filename, args.dataset)
         store = torch.zeros(batch['length'], 19)
 
+        # hangs here
         predictions = classifier(batch)
         store.index_add_(0, batch['point_ids'], predictions.cpu())
         pred = store.max(1)[1].numpy().astype(int)
@@ -217,7 +226,6 @@ with torch.no_grad():
             print('IoU class {i:} [{class_str:}] = {jacc:.3f}'.format(
                 i=i, class_str=label_to_names[i], jacc=jacc * 100))
         print('Eval point avg class IoU: %f' % (m_jaccard * 100))
-
 
 
 
