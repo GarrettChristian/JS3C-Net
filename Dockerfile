@@ -35,8 +35,8 @@ RUN chmod +x kitware-archive.sh && ./kitware-archive.sh
 
 RUN pip3 install numpy==1.19.5
 RUN pip3 install cython==0.29.24
-RUN pip3 install pyyaml==5.1.1
 RUN pip3 install tqdm==4.64.0
+RUN pip3 install pyyaml==5.1.1
 RUN apt install -y libjpeg-dev zlib1g-dev
 RUN pip3 install --upgrade Pillow
 RUN pip3 install torch==1.4.0
