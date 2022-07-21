@@ -33,25 +33,30 @@ WORKDIR /
 RUN wget https://apt.kitware.com/kitware-archive.sh
 RUN chmod +x kitware-archive.sh && ./kitware-archive.sh
 
-# ENV CUDA_HOME=/usr/local/cuda-10.1
-
-RUN ln -s /usr/bin/python3 /usr/bin/python & \
-    ln -s /usr/bin/pip3 /usr/bin/pip
-
 RUN pip3 install numpy==1.19.5
-RUN pip3 install torch==1.3.1
-# RUN pip3 install torch==1.6.0
-# RUN pip3 install torch==1.4.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 RUN pip3 install cython==0.29.24
 RUN pip3 install pyyaml==5.1.1
 RUN pip3 install tqdm==4.64.0
+RUN apt install -y libjpeg-dev zlib1g-dev
+RUN pip3 install --upgrade Pillow
+RUN pip3 install torch==1.4.0
+# RUN pip3 install torch==1.6.0
+# RUN pip3 install torch==1.4.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+
+
+ENV PATH=/usr/local/cuda-10.1/bin${PATH:+:${PATH}}
+ENV LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+ENV CUDA_HOME=/usr/local/cuda-10.1
+ENV CUDA_PATH=/usr/local/cuda-10.1
+RUN TORCH_CUDA_ARCH_LIST="6.1"
+
+
 
 # https://github.com/facebookresearch/SparseConvNet/issues/96
 RUN apt-get install -y libsparsehash-dev
 
 RUN ls
-# RUN git clone https://github.com/GarrettChristian/JS3C-Net.git
-RUN git clone https://github.com/yanx27/JS3C-Net.git
+RUN git clone https://github.com/GarrettChristian/JS3C-Net.git
 WORKDIR /JS3C-Net/lib
 RUN bash compile.sh
 WORKDIR /
@@ -79,8 +84,7 @@ WORKDIR /spconv/dist
 RUN pip3 install *.whl
 WORKDIR /
 
-RUN apt install -y libjpeg-dev zlib1g-dev
-RUN pip3 install --upgrade Pillow
+
 
 RUN pip3 list
 
