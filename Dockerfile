@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
+FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -39,9 +39,9 @@ RUN pip3 install tqdm==4.64.0
 RUN pip3 install pyyaml==5.1.1
 RUN apt install -y libjpeg-dev zlib1g-dev
 RUN pip3 install --upgrade Pillow
-RUN pip3 install torch==1.4.0
 # RUN pip3 install torch==1.6.0
-# RUN pip3 install torch==1.4.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip3 install torch==1.3.1
+# RUN pip3 install torch==1.3.1+cu100-f https://download.pytorch.org/whl/torch_stable.html
 
 
 ENV PATH=/usr/local/cuda-10.1/bin${PATH:+:${PATH}}
@@ -58,8 +58,13 @@ RUN apt-get install -y libsparsehash-dev
 RUN ls
 RUN git clone https://github.com/GarrettChristian/JS3C-Net.git
 WORKDIR /JS3C-Net/lib
-RUN bash compile.sh
+RUN python3 setup.py develop
+WORKDIR /JS3C-Net/lib/nearest_neighbors
+RUN python3 setup.py install
+# WORKDIR /JS3C-Net/lib/pointgroup_ops
+# RUN python3 setup.py develop
 WORKDIR /
+
 
 
 # SpConv
@@ -74,7 +79,7 @@ RUN git submodule update --init --recursive
 # needs to be done before we can apply the patches
 RUN git config --global user.email "test@test.com"
 RUN git config --global user.name "Test"
-RUN git am /hotfixes/0001-fix-problem-with-torch-1.4.patch 
+# RUN git am /hotfixes/0001-fix-problem-with-torch-1.4.patch 
 RUN git am /hotfixes/0001-Allow-to-specifiy-CUDA_ROOT-directory-and-pick-corre.patch
 RUN apt install -y libboost-all-dev cmake
 ENV CUDA_ROOT=/usr/local/cuda
